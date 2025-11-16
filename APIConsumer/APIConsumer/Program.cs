@@ -14,3 +14,24 @@
  * DELETE - remove data.
  * 
  ******************************************************************************************/
+
+HttpClient httpClient = new HttpClient();
+
+string uri = @"https://jsonplaceholder.typicode.com/posts";
+
+try
+{
+    //using var response = await httpClient.GetAsync(@"https://jsonplaceholder.typicode.com/posts");
+    //response.EnsureSuccessStatusCode();
+    //string responseBody = await response.Content.ReadAsStringAsync();
+
+    // This is equivalent to the previous three lines.
+    string responseBody = await httpClient.GetStringAsync(uri);
+
+    Console.WriteLine(responseBody);
+}
+catch(Exception e)
+{
+    Console.WriteLine("\nException Caught!");
+    Console.WriteLine("Message :{0} ", e.Message);
+}
