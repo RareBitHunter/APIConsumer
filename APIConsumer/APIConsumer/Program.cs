@@ -1,37 +1,52 @@
 ﻿/*******************************************************************************************
  * 
- * Test programme for API consumption.
+ * Auth: DRT
+ * Date: 16/11/2025
  * 
- * This script makes use of https://jsonplaceholder.typicode.com/.
- * A free fake API for testing and prototyping.
+ * Description: 
  * 
- * {JSON}Placeholder is a REST API (REpresentational State Transfer). Therefore, it utilises
- * HTTP methods (verbs) to act on resources (nouns). The most common verbs being:
- * 
- * GET - retrieve data.
- * POST - create data.
- * PUT / PATCH - update data.
- * DELETE - remove data.
+ * Programme entry point.
  * 
  ******************************************************************************************/
 
-HttpClient httpClient = new HttpClient();
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using APIConsumer;
 
-string uri = @"https://jsonplaceholder.typicode.com/posts";
+// Use builder to load required JSON file.
+var builder = new ConfigurationBuilder()
+                    .SetBasePath(AppContext.BaseDirectory)
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
 
-try
-{
-    //using var response = await httpClient.GetAsync(@"https://jsonplaceholder.typicode.com/posts");
-    //response.EnsureSuccessStatusCode();
-    //string responseBody = await response.Content.ReadAsStringAsync();
+// Creates service collections and adds services.
+ServiceCollection services = new();
+services.AddSingleton<Application>();
+services.AddSingleton<IConfiguration>(builder);
 
-    // This is equivalent to the previous three lines.
-    string responseBody = await httpClient.GetStringAsync(uri);
+// Build the DI container.
+var provider = services.BuildServiceProvider();
 
-    Console.WriteLine(responseBody);
-}
-catch(Exception e)
-{
-    Console.WriteLine("\nException Caught!");
-    Console.WriteLine("Message :{0} ", e.Message);
-}
+// Run main application.
+var app = provider.GetRequiredService<Application>();
+app.Run();
+
+// TODO: Add API calls as a separate service.
+
+//HttpClient httpClient = new HttpClient();
+
+//string uri = @"https://jsonplaceholder.typicode.com/posts";
+
+//try
+//{
+//    // Fetches resource and converts to string.
+//    // Throws and returns error code if unsuccessful.
+//    string responseBody = await httpClient.GetStringAsync(uri);
+
+//    Console.WriteLine(responseBody);
+//}
+//catch(Exception e)
+//{
+//    Console.WriteLine("\nException Caught!");
+//    Console.WriteLine("Message :{0} ", e.Message);
+//}
