@@ -1,11 +1,25 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿/*******************************************************************************************
+ * 
+ * Auth: DRT
+ * Date: 16/11/2025
+ * 
+ * Description: API service.
+ * 
+ ******************************************************************************************/
+
+using Microsoft.Extensions.Configuration;
 
 namespace APIConsumer
 {
-    internal class ApiService : IApiService
+    public class ApiService : IApiService
     {
         private readonly HttpClient _httpClient;
 
+        /// <summary>
+        /// Constructor for injecting config and obtaining auth.
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config"></param>
         public ApiService( HttpClient httpClient , IConfiguration config )
         {
             _httpClient = httpClient;
@@ -21,10 +35,15 @@ namespace APIConsumer
             }
         }
 
-        public async Task<string?> GetStatusAsync()
+        /// <summary>
+        /// Uses 'GET' verb on '/posts' noun.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> GetPostsAsync()
         {
-            // Example GET request to /status endpoint.
-            return await _httpClient.GetStringAsync("status");
+            var posts = await _httpClient.GetStringAsync("posts");
+
+            return posts; 
         }
     }
 }

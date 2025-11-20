@@ -36,11 +36,15 @@ builder.Services.AddSingleton<Application>();
 builder.Services.AddHttpClient<IApiService , ApiService>(client =>
 {
     var baseUri = builder.Configuration ["ApiSettings:BaseUri"];
-    client.BaseAddress = new Uri(baseUri ?? "String was NULL");
+
+    if ( baseUri is null )
+        throw new InvalidOperationException("ApiSettings:BaseUri is missing.");
+
+    client.BaseAddress = new Uri(baseUri);
 });
 
 IHost host = builder.Build();
 
 // Run main application.
 Application app = host.Services.GetRequiredService<Application>();
-app.Run();
+await app.Run();

@@ -9,8 +9,8 @@
 
 namespace APIConsumer
 {
-    internal interface IApiService
+    public interface IApiService
     {
-        Task<string?> GetStatusAsync();
+        Task<string> GetPostsAsync();
     }
 }
