@@ -3,50 +3,44 @@
  * Auth: DRT
  * Date: 16/11/2025
  * 
- * Description: 
+ * Description: Program entry point.
  * 
- * Programme entry point.
+ * Builds a .NET Generic Host using the 'Microsoft.Extensions.Hosting' package. A 'host' is 
+ * an object that encapsulates an app's resources and lifetime functionality, such as:
+ * 
+ * + Dependency injection (DI)
+ * + Logging
+ * + Configuration
+ * + App shutdown
+ * + IHostedService implementations
+ * 
+ * Requires Microsoft.Extensions.Http package to expose "AddHttpClient". 
  * 
  ******************************************************************************************/
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using APIConsumer;
 
-// Use builder to load required JSON file.
-var builder = new ConfigurationBuilder()
-                    .SetBasePath(AppContext.BaseDirectory)
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .Build();
+// Create host builder.
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
-// Creates service collections and adds services.
-ServiceCollection services = new();
-services.AddSingleton<Application>();
-services.AddSingleton<IConfiguration>(builder);
+// Configure host.
+builder.Configuration.AddJsonFile("appsettings.json" , optional: false , reloadOnChange: true);
 
-// Build the DI container.
-var provider = services.BuildServiceProvider();
+// Register services.
+// Only want one instance of our main app.
+// Use AddHttpClient to manage HttpClient instances correctly.
+builder.Services.AddSingleton<Application>();
+builder.Services.AddHttpClient<IApiService , ApiService>(client =>
+{
+    var baseUri = builder.Configuration ["ApiSettings:BaseUri"];
+    client.BaseAddress = new Uri(baseUri ?? "String was NULL");
+});
+
+IHost host = builder.Build();
 
 // Run main application.
-var app = provider.GetRequiredService<Application>();
+Application app = host.Services.GetRequiredService<Application>();
 app.Run();
-
-// TODO: Add API calls as a separate service.
-
-//HttpClient httpClient = new HttpClient();
-
-//string uri = @"https://jsonplaceholder.typicode.com/posts";
-
-//try
-//{
-//    // Fetches resource and converts to string.
-//    // Throws and returns error code if unsuccessful.
-//    string responseBody = await httpClient.GetStringAsync(uri);
-
-//    Console.WriteLine(responseBody);
-//}
-//catch(Exception e)
-//{
-//    Console.WriteLine("\nException Caught!");
-//    Console.WriteLine("Message :{0} ", e.Message);
-//}
